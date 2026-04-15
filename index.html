@@ -1,0 +1,2139 @@
+<!-- File: index.html -->
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="高機能Todoアプリケーション">
+  <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)">
+  <title>Todo App</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+</head>
+<body data-theme="light" data-density="normal" data-font-size="medium" data-color-theme="default" data-view="list" data-time-format="24h" data-time-display="relative">
+
+  <!-- スキップリンク (#283) -->
+  <a href="#main-content" class="skip-link" data-testid="skip-link">メインコンテンツへスキップ</a>
+
+  <!-- オフラインバナー (#176) -->
+  <div id="offline-banner" class="offline-banner" role="alert" aria-live="assertive" hidden data-testid="offline-banner">
+    <span class="offline-banner__icon">⚡</span>
+    <span class="offline-banner__text">オフラインモード — 変更はオンライン復帰時に同期されます</span>
+  </div>
+
+  <!-- モックモードバナー (#378) -->
+  <div id="mock-banner" class="mock-banner" role="status" hidden data-testid="mock-banner">
+    <span>MOCK MODE</span>
+  </div>
+
+  <!-- チュートリアルオーバーレイ (#200, #292) -->
+  <div id="tutorial-overlay" class="tutorial-overlay" role="dialog" aria-modal="true" aria-label="操作チュートリアル" hidden data-testid="tutorial-overlay">
+    <div class="tutorial-overlay__backdrop"></div>
+    <div class="tutorial-overlay__content">
+      <div class="tutorial-overlay__step" data-step="1">
+        <div class="tutorial-overlay__highlight-ref" data-target="todo-input-area"></div>
+        <div class="tutorial-overlay__card">
+          <div class="tutorial-overlay__step-indicator">
+            <span class="tutorial-overlay__step-current">1</span> / <span class="tutorial-overlay__step-total">5</span>
+          </div>
+          <h3 class="tutorial-overlay__title">タスクを追加する</h3>
+          <p class="tutorial-overlay__description">入力欄にタイトルを入力して、追加ボタンまたはCtrl+Enterで新しいTodoを作成できます。</p>
+          <div class="tutorial-overlay__actions">
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--skip" data-testid="tutorial-skip">スキップ</button>
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--next" data-testid="tutorial-next">次へ</button>
+          </div>
+        </div>
+      </div>
+      <div class="tutorial-overlay__step" data-step="2" hidden>
+        <div class="tutorial-overlay__highlight-ref" data-target="todo-list-area"></div>
+        <div class="tutorial-overlay__card">
+          <div class="tutorial-overlay__step-indicator">
+            <span class="tutorial-overlay__step-current">2</span> / <span class="tutorial-overlay__step-total">5</span>
+          </div>
+          <h3 class="tutorial-overlay__title">タスクを管理する</h3>
+          <p class="tutorial-overlay__description">チェックボックスで完了/未完了を切り替え、ダブルクリックでタイトルを編集できます。右クリックで詳細メニューも利用可能です。</p>
+          <div class="tutorial-overlay__actions">
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--prev" data-testid="tutorial-prev">戻る</button>
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--next" data-testid="tutorial-next">次へ</button>
+          </div>
+        </div>
+      </div>
+      <div class="tutorial-overlay__step" data-step="3" hidden>
+        <div class="tutorial-overlay__highlight-ref" data-target="filter-area"></div>
+        <div class="tutorial-overlay__card">
+          <div class="tutorial-overlay__step-indicator">
+            <span class="tutorial-overlay__step-current">3</span> / <span class="tutorial-overlay__step-total">5</span>
+          </div>
+          <h3 class="tutorial-overlay__title">フィルタ・検索</h3>
+          <p class="tutorial-overlay__description">キーワード検索、完了状態フィルタ、日付範囲指定など多彩な絞り込みが可能です。「/」キーで検索欄にフォーカスできます。</p>
+          <div class="tutorial-overlay__actions">
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--prev" data-testid="tutorial-prev">戻る</button>
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--next" data-testid="tutorial-next">次へ</button>
+          </div>
+        </div>
+      </div>
+      <div class="tutorial-overlay__step" data-step="4" hidden>
+        <div class="tutorial-overlay__highlight-ref" data-target="stats-area"></div>
+        <div class="tutorial-overlay__card">
+          <div class="tutorial-overlay__step-indicator">
+            <span class="tutorial-overlay__step-current">4</span> / <span class="tutorial-overlay__step-total">5</span>
+          </div>
+          <h3 class="tutorial-overlay__title">統計・分析</h3>
+          <p class="tutorial-overlay__description">完了率、作成件数グラフ、ストリーク計算など、進捗の可視化機能が充実しています。</p>
+          <div class="tutorial-overlay__actions">
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--prev" data-testid="tutorial-prev">戻る</button>
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--next" data-testid="tutorial-next">次へ</button>
+          </div>
+        </div>
+      </div>
+      <div class="tutorial-overlay__step" data-step="5" hidden>
+        <div class="tutorial-overlay__highlight-ref" data-target="command-palette-trigger"></div>
+        <div class="tutorial-overlay__card">
+          <div class="tutorial-overlay__step-indicator">
+            <span class="tutorial-overlay__step-current">5</span> / <span class="tutorial-overlay__step-total">5</span>
+          </div>
+          <h3 class="tutorial-overlay__title">コマンドパレット</h3>
+          <p class="tutorial-overlay__description">Ctrl+Kでコマンドパレットを開き、検索・フィルタ・テーマ切替などすべての操作をキーボードだけで実行できます。</p>
+          <div class="tutorial-overlay__actions">
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--prev" data-testid="tutorial-prev">戻る</button>
+            <button type="button" class="tutorial-overlay__btn tutorial-overlay__btn--finish" data-testid="tutorial-finish">始める</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase接続エラー画面 (#99, #297) -->
+  <div id="connection-error-screen" class="connection-error-screen" role="alert" hidden data-testid="connection-error-screen">
+    <div class="connection-error-screen__content">
+      <div class="connection-error-screen__icon">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" aria-hidden="true">
+          <circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="3" stroke-dasharray="6 4"/>
+          <path d="M30 30l20 20M50 30L30 50" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="connection-error-screen__title">接続できません</h1>
+      <p class="connection-error-screen__message">Supabaseへの接続を確立できませんでした。環境変数の設定を確認してください。</p>
+      <div class="connection-error-screen__details">
+        <code>SUPABASE_URL</code> と <code>SUPABASE_ANON_KEY</code> が正しく設定されている必要があります。
+      </div>
+      <button type="button" class="connection-error-screen__retry-btn" data-testid="connection-retry-btn">再試行</button>
+    </div>
+  </div>
+
+  <!-- メインアプリケーション -->
+  <div id="app" class="app" data-testid="app">
+
+    <!-- ヘッダー (#284) -->
+    <header class="app-header" role="banner" data-testid="app-header">
+      <div class="app-header__left">
+        <button type="button" id="sidebar-toggle" class="app-header__sidebar-toggle" aria-label="サイドバーを開閉" aria-expanded="true" aria-controls="sidebar" data-testid="sidebar-toggle" tabindex="0">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <rect y="3" width="20" height="2" rx="1" fill="currentColor"/>
+            <rect y="9" width="20" height="2" rx="1" fill="currentColor"/>
+            <rect y="15" width="20" height="2" rx="1" fill="currentColor"/>
+          </svg>
+        </button>
+        <h1 class="app-header__title">
+          <span class="app-header__logo" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 12.5l2.5 2.5 5.5-5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          Todo
+        </h1>
+      </div>
+
+      <div class="app-header__center">
+        <!-- オンライン/リアルタイム状態 (#175, #181) -->
+        <div class="app-header__status" data-testid="connection-status">
+          <span id="online-indicator" class="status-indicator status-indicator--online" aria-label="オンライン" data-testid="online-indicator">
+            <span class="status-indicator__dot"></span>
+          </span>
+          <span id="realtime-indicator" class="status-indicator status-indicator--realtime" aria-label="リアルタイム同期中" data-testid="realtime-indicator" hidden>
+            <span class="status-indicator__dot"></span>
+            <span class="status-indicator__label">Realtime</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="app-header__right">
+        <!-- コマンドパレットトリガー (#459) -->
+        <button type="button" id="command-palette-trigger" class="app-header__action-btn" aria-label="コマンドパレットを開く (Ctrl+K)" data-testid="command-palette-trigger" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="7.5" cy="7.5" r="5" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span class="app-header__shortcut-hint">Ctrl+K</span>
+        </button>
+
+        <!-- 集中モード (#484, #485) -->
+        <button type="button" id="focus-mode-toggle" class="app-header__action-btn" aria-label="集中モード切替 (F)" aria-pressed="false" data-testid="focus-mode-toggle" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="5" y="5" width="8" height="8" rx="1" fill="currentColor" opacity="0.3"/>
+          </svg>
+        </button>
+
+        <!-- ヘルプ (#291) -->
+        <button type="button" id="help-btn" class="app-header__action-btn" aria-label="ヘルプを開く" data-testid="help-btn" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M6.5 6.8a2.5 2.5 0 014.3 1.7c0 1.5-2.3 1.5-2.3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="9" cy="13.5" r="0.8" fill="currentColor"/>
+          </svg>
+        </button>
+
+        <!-- 通知設定 (#227) -->
+        <button type="button" id="notification-toggle" class="app-header__action-btn" aria-label="通知設定" aria-pressed="false" data-testid="notification-toggle" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <path d="M9 2a5 5 0 00-5 5v3l-1.5 2h13L14 10V7a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M7 15a2 2 0 004 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <span id="notification-badge" class="app-header__badge" hidden data-testid="notification-badge">0</span>
+        </button>
+
+        <!-- 設定 (#197) -->
+        <button type="button" id="settings-btn" class="app-header__action-btn" aria-label="設定を開く" data-testid="settings-btn" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.05 3.05l1.41 1.41M13.54 13.54l1.41 1.41M3.05 14.95l1.41-1.41M13.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- テーマ切替 (#83) -->
+        <button type="button" id="theme-toggle" class="app-header__action-btn" aria-label="テーマを切り替え" aria-pressed="false" data-testid="theme-toggle" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" class="theme-icon theme-icon--light">
+            <circle cx="9" cy="9" r="4" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M9 1v2M9 15v2M1 9h2M15 9h2M3.7 3.7l1.4 1.4M12.9 12.9l1.4 1.4M3.7 14.3l1.4-1.4M12.9 5.1l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true" class="theme-icon theme-icon--dark" hidden>
+            <path d="M15.1 10.4A6.5 6.5 0 017.6 2.9a7 7 0 107.5 7.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <!-- サイドバー (#387, #388) -->
+      <aside id="sidebar" class="sidebar" role="complementary" aria-label="フィルタ・統計サイドバー" data-testid="sidebar">
+        <div class="sidebar__inner">
+
+          <!-- 統計サマリー (#65-72, #402, #408, #410) -->
+          <section class="sidebar__section stats-summary" id="stats-area" aria-label="統計情報" data-testid="stats-area">
+            <h2 class="sidebar__section-title">統計</h2>
+
+            <!-- レベル・経験値 (#410, #411) -->
+            <div class="stats-summary__level" data-testid="level-display">
+              <span class="stats-summary__level-badge">Lv.<span id="level-value">1</span></span>
+              <div class="stats-summary__exp-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="経験値">
+                <div id="exp-bar-fill" class="stats-summary__exp-bar-fill" style="width:0%"></div>
+              </div>
+              <span class="stats-summary__exp-text" id="exp-text">0 / 10</span>
+            </div>
+
+            <!-- ストリーク (#249, #408) -->
+            <div class="stats-summary__streak" data-testid="streak-display">
+              <span id="streak-icon" class="stats-summary__streak-icon" aria-hidden="true">🔥</span>
+              <span id="streak-count" class="stats-summary__streak-count">0</span>
+              <span class="stats-summary__streak-label">日連続</span>
+            </div>
+
+            <!-- 完了率 (#68) -->
+            <div class="stats-summary__progress" data-testid="progress-display">
+              <div class="stats-summary__progress-ring">
+                <svg viewBox="0 0 80 80" class="stats-summary__progress-svg" aria-hidden="true">
+                  <circle cx="40" cy="40" r="34" class="stats-summary__progress-track"/>
+                  <circle cx="40" cy="40" r="34" id="progress-ring-fill" class="stats-summary__progress-fill" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+                </svg>
+                <span id="progress-percent" class="stats-summary__progress-text" aria-label="完了率">0%</span>
+              </div>
+            </div>
+
+            <!-- 件数カウンタ (#65, #66, #67) -->
+            <div class="stats-summary__counts" data-testid="counts-display">
+              <div class="stats-summary__count-item">
+                <span class="stats-summary__count-value" id="total-count" data-testid="total-count">0</span>
+                <span class="stats-summary__count-label">総数</span>
+              </div>
+              <div class="stats-summary__count-item stats-summary__count-item--active">
+                <span class="stats-summary__count-value" id="active-count" data-testid="active-count">0</span>
+                <span class="stats-summary__count-label">未完了</span>
+              </div>
+              <div class="stats-summary__count-item stats-summary__count-item--completed">
+                <span class="stats-summary__count-value" id="completed-count" data-testid="completed-count">0</span>
+                <span class="stats-summary__count-label">完了</span>
+              </div>
+            </div>
+
+            <!-- デイリー目標 (#401, #402) -->
+            <div class="stats-summary__daily-goal" data-testid="daily-goal">
+              <div class="stats-summary__daily-goal-header">
+                <span class="stats-summary__daily-goal-title">今日の目標</span>
+                <button type="button" id="daily-goal-edit-btn" class="stats-summary__daily-goal-edit" aria-label="目標を編集" data-testid="daily-goal-edit-btn">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M10 2l2 2-7 7H3v-2l7-7z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+              <div class="stats-summary__daily-goal-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="5" aria-label="デイリー目標進捗">
+                <div id="daily-goal-fill" class="stats-summary__daily-goal-fill" style="width:0%"></div>
+              </div>
+              <span class="stats-summary__daily-goal-text" id="daily-goal-text">0 / 5 件完了</span>
+            </div>
+
+            <!-- 今日の追加・完了 (#69, #70) -->
+            <div class="stats-summary__today" data-testid="today-stats">
+              <div class="stats-summary__today-item">
+                <span class="stats-summary__today-value" id="today-added">0</span>
+                <span class="stats-summary__today-label">今日追加</span>
+              </div>
+              <div class="stats-summary__today-item">
+                <span class="stats-summary__today-value" id="today-completed">0</span>
+                <span class="stats-summary__today-label">今日完了</span>
+              </div>
+            </div>
+
+            <!-- 統計ダッシュボードへのリンク (#252) -->
+            <button type="button" id="open-dashboard-btn" class="sidebar__link-btn" data-testid="open-dashboard-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="7" width="3" height="6" rx="0.5" fill="currentColor"/><rect x="5.5" y="4" width="3" height="9" rx="0.5" fill="currentColor"/><rect x="10" y="1" width="3" height="12" rx="0.5" fill="currentColor"/></svg>
+              <span>統計ダッシュボード</span>
+            </button>
+          </section>
+
+          <!-- フィルタ (#11-20, #119-130) -->
+          <section class="sidebar__section filter-panel" id="filter-area" aria-label="フィルタ" data-testid="filter-area">
+            <h2 class="sidebar__section-title">フィルタ</h2>
+
+            <!-- 完了状態フィルタ (#11, #12, #13) -->
+            <fieldset class="filter-panel__group" data-testid="status-filter">
+              <legend class="filter-panel__legend">完了状態</legend>
+              <div class="filter-panel__radio-group" role="radiogroup" aria-label="完了状態フィルタ">
+                <label class="filter-panel__radio-label">
+                  <input type="radio" name="statusFilter" value="all" checked class="filter-panel__radio" data-testid="filter-all" tabindex="0">
+                  <span class="filter-panel__radio-custom"></span>
+                  <span>すべて</span>
+                </label>
+                <label class="filter-panel__radio-label">
+                  <input type="radio" name="statusFilter" value="active" class="filter-panel__radio" data-testid="filter-active">
+                  <span class="filter-panel__radio-custom"></span>
+                  <span>未完了</span>
+                </label>
+                <label class="filter-panel__radio-label">
+                  <input type="radio" name="statusFilter" value="completed" class="filter-panel__radio" data-testid="filter-completed">
+                  <span class="filter-panel__radio-custom"></span>
+                  <span>完了済み</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- 期間フィルタ (#16, #17, #18, #19) -->
+            <fieldset class="filter-panel__group" data-testid="period-filter">
+              <legend class="filter-panel__legend">期間</legend>
+              <div class="filter-panel__select-wrap">
+                <select id="period-filter" class="filter-panel__select" aria-label="期間フィルタ" data-testid="period-filter-select" tabindex="0">
+                  <option value="all">すべての期間</option>
+                  <option value="today-created">今日作成</option>
+                  <option value="week-created">今週作成</option>
+                  <option value="month-created">今月作成</option>
+                  <option value="today-updated">今日更新</option>
+                </select>
+                <span class="filter-panel__select-arrow" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </span>
+              </div>
+            </fieldset>
+
+            <!-- 日付範囲フィルタ (#123, #124) -->
+            <fieldset class="filter-panel__group" data-testid="date-range-filter">
+              <legend class="filter-panel__legend">日付範囲</legend>
+              <div class="filter-panel__date-range">
+                <div class="filter-panel__date-range-type">
+                  <select id="date-range-type" class="filter-panel__select filter-panel__select--small" aria-label="日付範囲の種類" data-testid="date-range-type" tabindex="0">
+                    <option value="created">作成日</option>
+                    <option value="updated">更新日</option>
+                  </select>
+                </div>
+                <div class="filter-panel__date-range-inputs">
+                  <label class="filter-panel__date-label">
+                    <span class="visually-hidden">開始日</span>
+                    <input type="date" id="date-from" class="filter-panel__date-input" aria-label="開始日" data-testid="date-from" tabindex="0">
+                  </label>
+                  <span class="filter-panel__date-separator" aria-hidden="true">〜</span>
+                  <label class="filter-panel__date-label">
+                    <span class="visually-hidden">終了日</span>
+                    <input type="date" id="date-to" class="filter-panel__date-input" aria-label="終了日" data-testid="date-to" tabindex="0">
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- タイトル文字数フィルタ (#269) -->
+            <fieldset class="filter-panel__group" data-testid="length-filter">
+              <legend class="filter-panel__legend">タイトル文字数</legend>
+              <div class="filter-panel__length-range">
+                <label>
+                  <span class="visually-hidden">最小文字数</span>
+                  <input type="number" id="title-length-min" class="filter-panel__number-input" min="0" placeholder="最小" aria-label="最小文字数" data-testid="title-length-min" tabindex="0">
+                </label>
+                <span class="filter-panel__date-separator" aria-hidden="true">〜</span>
+                <label>
+                  <span class="visually-hidden">最大文字数</span>
+                  <input type="number" id="title-length-max" class="filter-panel__number-input" min="0" placeholder="最大" aria-label="最大文字数" data-testid="title-length-max" tabindex="0">
+                </label>
+              </div>
+            </fieldset>
+
+            <!-- 保存済みフィルタ (#395, #396, #399) -->
+            <fieldset class="filter-panel__group" data-testid="saved-filters">
+              <legend class="filter-panel__legend">保存済みフィルタ</legend>
+              <div class="filter-panel__saved-list" id="saved-filter-list" data-testid="saved-filter-list">
+                <!-- JS側で動的生成 -->
+              </div>
+              <button type="button" id="save-current-filter-btn" class="filter-panel__save-btn" data-testid="save-current-filter-btn" tabindex="0">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span>現在のフィルタを保存</span>
+              </button>
+            </fieldset>
+
+            <!-- フィルタリセット (#20) -->
+            <button type="button" id="filter-reset-btn" class="filter-panel__reset-btn" data-testid="filter-reset-btn" tabindex="0">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>フィルタをリセット</span>
+            </button>
+          </section>
+
+          <!-- お気に入り (#238, #239) -->
+          <section class="sidebar__section" data-testid="favorites-section">
+            <h2 class="sidebar__section-title">
+              お気に入り
+              <button type="button" id="clear-favorites-btn" class="sidebar__section-action" aria-label="お気に入りを全解除" data-testid="clear-favorites-btn" tabindex="0">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+            </h2>
+            <div id="favorites-list" class="sidebar__favorites-list" data-testid="favorites-list">
+              <p class="sidebar__empty-text">お気に入りはありません</p>
+            </div>
+          </section>
+
+          <!-- テンプレート (#142-145) -->
+          <section class="sidebar__section" data-testid="templates-section">
+            <h2 class="sidebar__section-title">テンプレート</h2>
+            <div id="template-list" class="sidebar__template-list" data-testid="template-list">
+              <!-- JS側で動的生成 -->
+            </div>
+            <button type="button" id="add-template-btn" class="filter-panel__save-btn" data-testid="add-template-btn" tabindex="0">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>現在の入力をテンプレート保存</span>
+            </button>
+          </section>
+
+          <!-- ポモドーロタイマー (#357-366) -->
+          <section class="sidebar__section pomodoro" data-testid="pomodoro-section">
+            <h2 class="sidebar__section-title">ポモドーロ</h2>
+            <div class="pomodoro__display" data-testid="pomodoro-display">
+              <span id="pomodoro-time" class="pomodoro__time" aria-label="残り時間" aria-live="polite">25:00</span>
+              <span id="pomodoro-phase" class="pomodoro__phase">作業</span>
+            </div>
+            <div id="pomodoro-linked-todo" class="pomodoro__linked-todo" hidden data-testid="pomodoro-linked-todo">
+              <span class="pomodoro__linked-label">作業中:</span>
+              <span id="pomodoro-linked-title" class="pomodoro__linked-title"></span>
+            </div>
+            <div class="pomodoro__controls">
+              <button type="button" id="pomodoro-start" class="pomodoro__btn pomodoro__btn--start" aria-label="タイマー開始" data-testid="pomodoro-start" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><polygon points="4,2 14,8 4,14" fill="currentColor"/></svg>
+              </button>
+              <button type="button" id="pomodoro-pause" class="pomodoro__btn pomodoro__btn--pause" aria-label="一時停止" hidden data-testid="pomodoro-pause" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="3" y="2" width="4" height="12" rx="1" fill="currentColor"/><rect x="9" y="2" width="4" height="12" rx="1" fill="currentColor"/></svg>
+              </button>
+              <button type="button" id="pomodoro-reset" class="pomodoro__btn pomodoro__btn--reset" aria-label="リセット" data-testid="pomodoro-reset" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8a5 5 0 109-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" id="pomodoro-sound-toggle" class="pomodoro__btn pomodoro__btn--sound" aria-label="サウンド切替" aria-pressed="true" data-testid="pomodoro-sound-toggle" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 5.5h2.5L8 2v12L4.5 10.5H2a1 1 0 01-1-1v-3a1 1 0 011-1z" fill="currentColor"/><path d="M11 5a4.5 4.5 0 010 6M13 3a7 7 0 010 10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="pomodoro__today-count" data-testid="pomodoro-today-count">
+              <span>本日: <strong id="pomodoro-count-value">0</strong> ポモドーロ</span>
+            </div>
+          </section>
+
+        </div>
+      </aside>
+
+      <!-- メインコンテンツ (#284) -->
+      <main id="main-content" class="main-content" role="main" data-testid="main-content">
+
+        <!-- 入力エリア (#1, #41-43, #74, #146-148, #335-346) -->
+        <section id="todo-input-area" class="input-area" aria-label="Todo追加" data-testid="todo-input-area">
+          <form id="todo-form" class="input-area__form" data-testid="todo-form" novalidate>
+            <div class="input-area__input-wrapper">
+              <div class="input-area__mode-toggle">
+                <button type="button" id="input-mode-toggle" class="input-area__mode-btn" aria-label="入力モード切替（シングルライン / マルチライン）" aria-pressed="false" data-testid="input-mode-toggle" tabindex="0">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="input-area__field-container">
+                <!-- シングルライン入力 -->
+                <input
+                  type="text"
+                  id="todo-input"
+                  class="input-area__input"
+                  placeholder="新しいタスクを入力... (Ctrl+Enterで追加)"
+                  maxlength="200"
+                  autocomplete="off"
+                  aria-label="Todoタイトル入力"
+                  aria-describedby="input-char-counter input-validation-msg"
+                  data-testid="todo-input"
+                  tabindex="0"
+                >
+                <!-- マルチライン入力 (#345, #147) -->
+                <textarea
+                  id="todo-textarea"
+                  class="input-area__textarea"
+                  placeholder="複数行で入力（1行=1タスク）... Ctrl+Enterで追加"
+                  maxlength="5000"
+                  rows="3"
+                  aria-label="Todo一括入力"
+                  aria-describedby="input-char-counter input-validation-msg"
+                  data-testid="todo-textarea"
+                  hidden
+                  tabindex="0"
+                ></textarea>
+
+                <!-- オートコンプリートドロップダウン (#342, #343) -->
+                <div id="autocomplete-dropdown" class="input-area__autocomplete" role="listbox" aria-label="タイトル候補" hidden data-testid="autocomplete-dropdown">
+                  <!-- JS側で動的生成 -->
+                </div>
+
+                <!-- 検索サジェスト (#129) — 検索欄用だが構造定義 -->
+              </div>
+
+              <!-- 音声入力ボタン (#301, #302) -->
+              <button type="button" id="voice-input-btn" class="input-area__voice-btn" aria-label="音声入力" data-testid="voice-input-btn" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <rect x="6.5" y="1" width="5" height="10" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M3.5 8.5a5.5 5.5 0 0011 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M9 14.5v2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="input-area__voice-recording-indicator" hidden aria-hidden="true"></span>
+              </button>
+
+              <!-- 絵文字ピッカー (#270) -->
+              <button type="button" id="emoji-picker-btn" class="input-area__emoji-btn" aria-label="絵文字を挿入" data-testid="emoji-picker-btn" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                  <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.4"/>
+                  <circle cx="6.5" cy="7.5" r="1" fill="currentColor"/>
+                  <circle cx="11.5" cy="7.5" r="1" fill="currentColor"/>
+                  <path d="M5.5 11a4 4 0 007 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+              </button>
+
+              <!-- 追加ボタン -->
+              <button type="submit" id="todo-submit-btn" class="input-area__submit-btn" aria-label="Todoを追加" disabled data-testid="todo-submit-btn" tabindex="0">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <span class="input-area__submit-text">追加</span>
+              </button>
+            </div>
+
+            <!-- 入力メタ情報 -->
+            <div class="input-area__meta">
+              <span id="input-char-counter" class="input-area__char-counter" aria-live="polite" data-testid="char-counter">0 / 200</span>
+              <span id="input-validation-msg" class="input-area__validation-msg" role="alert" aria-live="assertive" data-testid="validation-msg"></span>
+              <span id="duplicate-warning" class="input-area__duplicate-warning" role="status" hidden data-testid="duplicate-warning">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1l6 11H1L7 1z" stroke="currentColor" stroke-width="1.2"/><path d="M7 5v3M7 9.5v.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                同じタイトルのTodoが既に存在します
+              </span>
+            </div>
+
+            <!-- 連続追加モード (#146) -->
+            <div class="input-area__options">
+              <label class="input-area__option-label">
+                <input type="checkbox" id="continuous-mode" class="input-area__option-checkbox" data-testid="continuous-mode" tabindex="0">
+                <span class="input-area__option-checkbox-custom"></span>
+                <span>連続追加モード</span>
+              </label>
+            </div>
+          </form>
+
+          <!-- 絵文字ピッカーパネル (#270) -->
+          <div id="emoji-picker-panel" class="emoji-picker" role="dialog" aria-label="絵文字ピッカー" hidden data-testid="emoji-picker-panel">
+            <div class="emoji-picker__categories" role="tablist" aria-label="絵文字カテゴリ">
+              <button type="button" role="tab" aria-selected="true" class="emoji-picker__category-btn" data-category="smileys" tabindex="0">😀</button>
+              <button type="button" role="tab" aria-selected="false" class="emoji-picker__category-btn" data-category="people" tabindex="-1">👋</button>
+              <button type="button" role="tab" aria-selected="false" class="emoji-picker__category-btn" data-category="nature" tabindex="-1">🌿</button>
+              <button type="button" role="tab" aria-selected="false" class="emoji-picker__category-btn" data-category="food" tabindex="-1">🍕</button>
+              <button type="button" role="tab" aria-selected="false" class="emoji-picker__category-btn" data-category="objects" tabindex="-1">📦</button>
+              <button type="button" role="tab" aria-selected="false" class="emoji-picker__category-btn" data-category="symbols" tabindex="-1">✅</button>
+            </div>
+            <div id="emoji-picker-grid" class="emoji-picker__grid" role="tabpanel" aria-label="絵文字一覧">
+              <!-- JS側で動的生成 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ツールバー (#14, #21-28, #29-36, #57-64, #7-10, #30, #332, #445) -->
+        <section class="toolbar" aria-label="操作ツールバー" data-testid="toolbar">
+          <div class="toolbar__row toolbar__row--primary">
+
+            <!-- 検索 (#14, #15, #119-122, #264, #265, #423-427) -->
+            <div class="toolbar__search" data-testid="search-area">
+              <div class="toolbar__search-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="toolbar__search-icon" aria-hidden="true">
+                  <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 10l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <input
+                  type="search"
+                  id="search-input"
+                  class="toolbar__search-input"
+                  placeholder="検索... (/ でフォーカス)"
+                  aria-label="キーワード検索"
+                  aria-describedby="search-result-count"
+                  autocomplete="off"
+                  data-testid="search-input"
+                  tabindex="0"
+                >
+                <button type="button" id="search-clear-btn" class="toolbar__search-clear" aria-label="検索をクリア" hidden data-testid="search-clear-btn" tabindex="0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="currentColor" opacity="0.2"/><path d="M4.5 4.5l5 5M9.5 4.5l-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                </button>
+                <!-- 検索サジェスト (#129) -->
+                <div id="search-suggest-dropdown" class="toolbar__search-suggest" role="listbox" aria-label="検索候補" hidden data-testid="search-suggest">
+                  <!-- JS側で動的生成 -->
+                </div>
+              </div>
+              <div class="toolbar__search-options">
+                <label class="toolbar__search-option" title="前方一致">
+                  <input type="checkbox" id="search-prefix-mode" data-testid="search-prefix-mode" tabindex="0">
+                  <span>前方一致</span>
+                </label>
+                <label class="toolbar__search-option" title="正規表現">
+                  <input type="checkbox" id="search-regex-mode" data-testid="search-regex-mode" tabindex="0">
+                  <span>正規表現</span>
+                </label>
+                <label class="toolbar__search-option" title="大文字/小文字区別">
+                  <input type="checkbox" id="search-case-sensitive" data-testid="search-case-sensitive" tabindex="0">
+                  <span>Aa</span>
+                </label>
+                <button type="button" id="search-help-btn" class="toolbar__search-help" aria-label="検索構文ヘルプ" data-testid="search-help-btn" tabindex="0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M5 5.5a2 2 0 013.5 1.5c0 1-1.5 1.2-1.5 2.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><circle cx="7" cy="11" r="0.6" fill="currentColor"/></svg>
+                </button>
+                <button type="button" id="search-history-clear-btn" class="toolbar__search-history-clear" aria-label="検索履歴をクリア" data-testid="search-history-clear-btn" tabindex="0">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                  <span>履歴クリア</span>
+                </button>
+              </div>
+              <span id="search-result-count" class="toolbar__search-result-count" role="status" aria-live="polite" data-testid="search-result-count"></span>
+            </div>
+
+            <!-- ソート (#21-28) -->
+            <div class="toolbar__sort" data-testid="sort-area">
+              <label class="toolbar__label" for="sort-select">並び替え</label>
+              <div class="toolbar__select-wrap">
+                <select id="sort-select" class="toolbar__select" aria-label="ソート順" data-testid="sort-select" tabindex="0">
+                  <option value="created_at-desc">作成日時 ↓ 新しい順</option>
+                  <option value="created_at-asc">作成日時 ↑ 古い順</option>
+                  <option value="updated_at-desc">更新日時 ↓ 新しい順</option>
+                  <option value="updated_at-asc">更新日時 ↑ 古い順</option>
+                  <option value="title-asc">タイトル A→Z</option>
+                  <option value="title-desc">タイトル Z→A</option>
+                  <option value="completed-asc">未完了が上</option>
+                  <option value="completed-compound">完了状態 → 作成日時</option>
+                  <option value="favorites">お気に入り優先</option>
+                  <option value="random">ランダム</option>
+                  <option value="custom">手動並び替え</option>
+                </select>
+                <span class="toolbar__select-arrow" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </span>
+              </div>
+              <!-- 逆順トグル (#476) -->
+              <button type="button" id="sort-reverse-btn" class="toolbar__icon-btn" aria-label="ソート順を反転" data-testid="sort-reverse-btn" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 2v12M4 14l-3-3M4 14l3-3M12 14V2M12 2l-3 3M12 2l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+
+            <!-- 表示切替 (#332, #445) -->
+            <div class="toolbar__view-toggle" role="radiogroup" aria-label="表示モード切替" data-testid="view-toggle">
+              <button type="button" class="toolbar__view-btn toolbar__view-btn--active" role="radio" aria-checked="true" aria-label="リスト表示" data-view="list" data-testid="view-list" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1 3h14M1 8h14M1 13h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" class="toolbar__view-btn" role="radio" aria-checked="false" aria-label="カード表示" data-view="card" data-testid="view-card" tabindex="-1">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+              </button>
+              <button type="button" class="toolbar__view-btn" role="radio" aria-checked="false" aria-label="カレンダー表示" data-view="calendar" data-testid="view-calendar" tabindex="-1">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="1" y="2.5" width="14" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 6.5h14" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 1v3M11.5 1v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+              <button type="button" class="toolbar__view-btn" role="radio" aria-checked="false" aria-label="タイムライン表示" data-view="timeline" data-testid="view-timeline" tabindex="-1">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 1v14" stroke="currentColor" stroke-width="1.3"/><circle cx="4" cy="4" r="2" fill="currentColor"/><circle cx="4" cy="9" r="2" fill="currentColor"/><circle cx="4" cy="14" r="1.5" stroke="currentColor" stroke-width="0.8" fill="none"/><path d="M7 4h7M7 9h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="toolbar__row toolbar__row--secondary">
+            <!-- 全選択 (#58) -->
+            <div class="toolbar__batch-select" data-testid="batch-select">
+              <label class="toolbar__checkbox-label">
+                <input type="checkbox" id="select-all-checkbox" class="toolbar__checkbox" aria-label="全選択/全解除" data-testid="select-all-checkbox" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+              </label>
+              <span id="selection-count" class="toolbar__selection-count" aria-live="polite" data-testid="selection-count" hidden>0件選択中</span>
+            </div>
+
+            <!-- 一括操作 (#7-10, #60-62, #267, #268, #474, #477) -->
+            <div class="toolbar__batch-actions" id="batch-actions" data-testid="batch-actions" hidden>
+              <button type="button" id="batch-complete-btn" class="toolbar__batch-btn" aria-label="選択を完了にする" data-testid="batch-complete-btn" tabindex="0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5l3 3 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>完了</span>
+              </button>
+              <button type="button" id="batch-uncomplete-btn" class="toolbar__batch-btn" aria-label="選択を未完了に戻す" data-testid="batch-uncomplete-btn" tabindex="0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span>未完了</span>
+              </button>
+              <button type="button" id="batch-delete-btn" class="toolbar__batch-btn toolbar__batch-btn--danger" aria-label="選択を削除" data-testid="batch-delete-btn" tabindex="0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 3.5h10M5 3.5V2.5a1 1 0 011-1h2a1 1 0 011 1v1M3.5 3.5l.7 8.5a1 1 0 001 .9h3.6a1 1 0 001-.9l.7-8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>削除</span>
+              </button>
+              <button type="button" id="batch-invert-btn" class="toolbar__batch-btn" aria-label="選択を反転" data-testid="batch-invert-btn" tabindex="0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 1l12 12" stroke="currentColor" stroke-width="1.2"/><path d="M1 1h12v12" fill="currentColor" opacity="0.15"/></svg>
+                <span>反転</span>
+              </button>
+
+              <!-- その他の一括操作ドロップダウン -->
+              <div class="toolbar__batch-more">
+                <button type="button" id="batch-more-btn" class="toolbar__batch-btn" aria-label="その他の一括操作" aria-haspopup="menu" aria-expanded="false" data-testid="batch-more-btn" tabindex="0">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="3" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11" cy="7" r="1.2" fill="currentColor"/></svg>
+                </button>
+                <div id="batch-more-menu" class="toolbar__dropdown-menu" role="menu" hidden data-testid="batch-more-menu">
+                  <button type="button" role="menuitem" data-action="batch-add-prefix" data-testid="batch-add-prefix" tabindex="-1">プレフィックス追加</button>
+                  <button type="button" role="menuitem" data-action="batch-remove-prefix" data-testid="batch-remove-prefix" tabindex="-1">プレフィックス除去</button>
+                  <button type="button" role="menuitem" data-action="batch-case-upper" data-testid="batch-case-upper" tabindex="-1">大文字に変換</button>
+                  <button type="button" role="menuitem" data-action="batch-case-lower" data-testid="batch-case-lower" tabindex="-1">小文字に変換</button>
+                  <button type="button" role="menuitem" data-action="batch-case-title" data-testid="batch-case-title" tabindex="-1">タイトルケースに変換</button>
+                  <hr class="toolbar__dropdown-divider" role="separator">
+                  <button type="button" role="menuitem" data-action="batch-replace" data-testid="batch-replace" tabindex="-1">一括置換</button>
+                  <button type="button" role="menuitem" data-action="batch-export-selected" data-testid="batch-export-selected" tabindex="-1">選択をエクスポート</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- グローバル一括操作 (#7-10) -->
+            <div class="toolbar__global-actions" data-testid="global-actions">
+              <button type="button" id="all-complete-btn" class="toolbar__global-btn" aria-label="全件一括完了" data-testid="all-complete-btn" tabindex="0">全件完了</button>
+              <button type="button" id="all-uncomplete-btn" class="toolbar__global-btn" aria-label="全件一括未完了戻し" data-testid="all-uncomplete-btn" tabindex="0">全件未完了</button>
+              <button type="button" id="delete-completed-btn" class="toolbar__global-btn toolbar__global-btn--warn" aria-label="完了済み一括削除" data-testid="delete-completed-btn" tabindex="0">完了済み削除</button>
+              <button type="button" id="delete-all-btn" class="toolbar__global-btn toolbar__global-btn--danger" aria-label="全件一括削除" data-testid="delete-all-btn" tabindex="0">全件削除</button>
+            </div>
+
+            <!-- 表示件数/ページネーションモード (#30, #31, #32) -->
+            <div class="toolbar__display-options" data-testid="display-options">
+              <label class="toolbar__label" for="page-size-select">表示</label>
+              <div class="toolbar__select-wrap toolbar__select-wrap--small">
+                <select id="page-size-select" class="toolbar__select toolbar__select--small" aria-label="表示件数" data-testid="page-size-select" tabindex="0">
+                  <option value="10">10件</option>
+                  <option value="25" selected>25件</option>
+                  <option value="50">50件</option>
+                  <option value="100">100件</option>
+                </select>
+                <span class="toolbar__select-arrow" aria-hidden="true">
+                  <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                </span>
+              </div>
+
+              <!-- ドラッグ並べ替え無効化トグル (#107) -->
+              <label class="toolbar__toggle-label" title="ドラッグ並べ替え">
+                <input type="checkbox" id="drag-enabled" class="toolbar__checkbox" checked data-testid="drag-enabled" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+                <span>ドラッグ</span>
+              </label>
+
+              <!-- 行番号表示 (#487) -->
+              <label class="toolbar__toggle-label" title="行番号表示">
+                <input type="checkbox" id="show-line-numbers" class="toolbar__checkbox" data-testid="show-line-numbers" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+                <span>行番号</span>
+              </label>
+
+              <!-- 日付グルーピング (#136) -->
+              <label class="toolbar__toggle-label" title="日付グルーピング">
+                <input type="checkbox" id="date-grouping" class="toolbar__checkbox" data-testid="date-grouping" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+                <span>日付区切り</span>
+              </label>
+
+              <!-- 完了済み折りたたみ (#472) -->
+              <label class="toolbar__toggle-label" title="完了済み折りたたみ">
+                <input type="checkbox" id="collapse-completed" class="toolbar__checkbox" data-testid="collapse-completed" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+                <span>完了を折畳</span>
+              </label>
+
+              <!-- ゼブラストライプ (#488) -->
+              <label class="toolbar__toggle-label" title="ゼブラストライプ">
+                <input type="checkbox" id="zebra-stripe" class="toolbar__checkbox" data-testid="zebra-stripe" tabindex="0">
+                <span class="toolbar__checkbox-custom"></span>
+                <span>縞模様</span>
+              </label>
+
+              <!-- 相対/絶対時刻切替 (#132) -->
+              <button type="button" id="time-display-toggle" class="toolbar__icon-btn" aria-label="時刻表示を切替（相対/絶対）" data-testid="time-display-toggle" tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 4v4.5l3 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+
+              <!-- 並べ替えリセット (#103) -->
+              <button type="button" id="custom-order-reset-btn" class="toolbar__icon-btn" aria-label="手動並べ替えをリセット" data-testid="custom-order-reset-btn" hidden tabindex="0">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 3v4h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 8a5 5 0 109-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+
+            <!-- データ操作 (#91-95, #185-190, #413-422) -->
+            <div class="toolbar__data-actions">
+              <div class="toolbar__data-dropdown">
+                <button type="button" id="data-actions-btn" class="toolbar__icon-btn" aria-label="データ操作メニュー" aria-haspopup="menu" aria-expanded="false" data-testid="data-actions-btn" tabindex="0">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 12l3-3 2.5 2L11 6l3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 3h3v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div id="data-actions-menu" class="toolbar__dropdown-menu toolbar__dropdown-menu--right" role="menu" hidden data-testid="data-actions-menu">
+                  <div class="toolbar__dropdown-group-label">エクスポート</div>
+                  <button type="button" role="menuitem" data-action="export-json" data-testid="export-json" tabindex="-1">JSON形式でダウンロード</button>
+                  <button type="button" role="menuitem" data-action="export-csv" data-testid="export-csv" tabindex="-1">CSV形式でダウンロード</button>
+                  <button type="button" role="menuitem" data-action="copy-plain" data-testid="copy-plain" tabindex="-1">テキストでコピー</button>
+                  <button type="button" role="menuitem" data-action="copy-markdown" data-testid="copy-markdown" tabindex="-1">Markdownでコピー</button>
+                  <button type="button" role="menuitem" data-action="copy-html" data-testid="copy-html" tabindex="-1">HTMLでコピー</button>
+                  <button type="button" role="menuitem" data-action="copy-tsv" data-testid="copy-tsv" tabindex="-1">TSV(Excel向き)でコピー</button>
+                  <hr class="toolbar__dropdown-divider" role="separator">
+                  <div class="toolbar__dropdown-group-label">インポート</div>
+                  <button type="button" role="menuitem" data-action="import-json" data-testid="import-json" tabindex="-1">JSONファイルを取り込み</button>
+                  <button type="button" role="menuitem" data-action="import-csv" data-testid="import-csv" tabindex="-1">CSVファイルを取り込み</button>
+                  <hr class="toolbar__dropdown-divider" role="separator">
+                  <div class="toolbar__dropdown-group-label">共有・印刷</div>
+                  <button type="button" role="menuitem" data-action="print" data-testid="print-btn" tabindex="-1">印刷</button>
+                  <button type="button" role="menuitem" data-action="share" data-testid="share-btn" tabindex="-1">共有</button>
+                  <button type="button" role="menuitem" data-action="share-email" data-testid="share-email-btn" tabindex="-1">メールで共有</button>
+                  <button type="button" role="menuitem" data-action="show-qr" data-testid="show-qr-btn" tabindex="-1">QRコード表示</button>
+                  <hr class="toolbar__dropdown-divider" role="separator">
+                  <div class="toolbar__dropdown-group-label">メンテナンス</div>
+                  <button type="button" role="menuitem" data-action="demo-data" data-testid="demo-data-btn" tabindex="-1">デモデータ投入</button>
+                  <button type="button" role="menuitem" data-action="delete-demo" data-testid="delete-demo-btn" tabindex="-1">[DEMO]データ削除</button>
+                  <button type="button" role="menuitem" data-action="cache-clear" data-testid="cache-clear-btn" tabindex="-1">キャッシュクリア</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 表示件数/総件数 (#33) -->
+          <div class="toolbar__row toolbar__row--info">
+            <span id="display-count" class="toolbar__display-count" aria-live="polite" data-testid="display-count">表示中: 0 / 0件</span>
+            <!-- 直近更新 (#71) -->
+            <span id="last-updated-todo" class="toolbar__last-updated" data-testid="last-updated-todo" hidden></span>
+          </div>
+        </section>
+
+        <!-- カレンダービュー (#435-446) -->
+        <section id="calendar-view" class="calendar-view" aria-label="カレンダー表示" hidden data-testid="calendar-view">
+          <div class="calendar-view__header">
+            <button type="button" id="calendar-prev" class="calendar-view__nav-btn" aria-label="前月" data-testid="calendar-prev" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <h2 id="calendar-title" class="calendar-view__title" data-testid="calendar-title">2026年4月</h2>
+            <button type="button" id="calendar-today-btn" class="calendar-view__today-btn" data-testid="calendar-today-btn" tabindex="0">今日</button>
+            <button type="button" id="calendar-next" class="calendar-view__nav-btn" aria-label="翌月" data-testid="calendar-next" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <!-- 週間/月間切替 (#440) -->
+            <div class="calendar-view__scale-toggle" role="radiogroup" aria-label="カレンダー表示単位">
+              <button type="button" role="radio" aria-checked="false" class="calendar-view__scale-btn" data-scale="week" data-testid="calendar-scale-week" tabindex="0">週</button>
+              <button type="button" role="radio" aria-checked="true" class="calendar-view__scale-btn calendar-view__scale-btn--active" data-scale="month" data-testid="calendar-scale-month" tabindex="-1">月</button>
+            </div>
+          </div>
+          <div class="calendar-view__grid" role="grid" aria-label="カレンダーグリッド" data-testid="calendar-grid">
+            <div class="calendar-view__weekdays" role="row">
+              <span role="columnheader">日</span>
+              <span role="columnheader">月</span>
+              <span role="columnheader">火</span>
+              <span role="columnheader">水</span>
+              <span role="columnheader">木</span>
+              <span role="columnheader">金</span>
+              <span role="columnheader">土</span>
+            </div>
+            <div id="calendar-cells" class="calendar-view__cells" data-testid="calendar-cells">
+              <!-- JS側で動的生成 -->
+            </div>
+          </div>
+        </section>
+
+        <!-- タイムラインビュー (#441, #442) -->
+        <section id="timeline-view" class="timeline-view" aria-label="タイムライン表示" hidden data-testid="timeline-view">
+          <div class="timeline-view__header">
+            <div class="timeline-view__scale-toggle" role="radiogroup" aria-label="タイムラインスケール">
+              <button type="button" role="radio" aria-checked="true" class="timeline-view__scale-btn timeline-view__scale-btn--active" data-scale="day" data-testid="timeline-scale-day" tabindex="0">日</button>
+              <button type="button" role="radio" aria-checked="false" class="timeline-view__scale-btn" data-scale="week" data-testid="timeline-scale-week" tabindex="-1">週</button>
+              <button type="button" role="radio" aria-checked="false" class="timeline-view__scale-btn" data-scale="month" data-testid="timeline-scale-month" tabindex="-1">月</button>
+            </div>
+          </div>
+          <div id="timeline-content" class="timeline-view__content" data-testid="timeline-content">
+            <!-- JS側で動的生成 -->
+          </div>
+        </section>
+
+        <!-- ファイルドロップゾーン (#421, #422) -->
+        <div id="file-drop-zone" class="file-drop-zone" role="region" aria-label="ファイルドロップエリア" hidden data-testid="file-drop-zone">
+          <div class="file-drop-zone__content">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+              <rect x="6" y="10" width="36" height="28" rx="4" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/>
+              <path d="M24 18v12M18 24h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <p>JSON / CSV ファイルをドロップしてインポート</p>
+          </div>
+        </div>
+
+        <!-- Todoリスト (#2, #57, #101-108, #136, #159, #284, #289, #325, #472, #488) -->
+        <section class="todo-list-container" aria-label="Todoリスト" data-testid="todo-list-container">
+
+          <!-- 完了済み折りたたみヘッダー (#472, #473) -->
+          <!-- （リスト表示モード時のみ表示、JS側で制御） -->
+
+          <!-- ローディングスケルトン (#50) -->
+          <div id="loading-skeleton" class="loading-skeleton" aria-label="読み込み中" role="status" data-testid="loading-skeleton">
+            <div class="loading-skeleton__item"></div>
+            <div class="loading-skeleton__item"></div>
+            <div class="loading-skeleton__item"></div>
+            <div class="loading-skeleton__item"></div>
+            <div class="loading-skeleton__item"></div>
+          </div>
+
+          <!-- リスト本体 -->
+          <ul id="todo-list" class="todo-list" role="list" aria-label="Todoアイテム一覧" data-testid="todo-list" tabindex="-1">
+            <!-- JS側で動的生成。以下はアイテムのテンプレート構造 -->
+            <!--
+            <li class="todo-item" role="listitem" data-id="{uuid}" data-testid="todo-item" draggable="true" tabindex="0" aria-label="{title}">
+              <span class="todo-item__line-number" aria-hidden="true">{n}</span>
+              <label class="todo-item__select">
+                <input type="checkbox" class="todo-item__select-checkbox" aria-label="選択" data-testid="todo-select-checkbox" tabindex="-1">
+                <span class="todo-item__select-custom"></span>
+              </label>
+              <div class="todo-item__drag-handle" aria-label="ドラッグハンドル" data-testid="drag-handle">
+                <svg width="12" height="16" viewBox="0 0 12 16" fill="none" aria-hidden="true"><circle cx="3" cy="3" r="1.2" fill="currentColor"/><circle cx="9" cy="3" r="1.2" fill="currentColor"/><circle cx="3" cy="8" r="1.2" fill="currentColor"/><circle cx="9" cy="8" r="1.2" fill="currentColor"/><circle cx="3" cy="13" r="1.2" fill="currentColor"/><circle cx="9" cy="13" r="1.2" fill="currentColor"/></svg>
+              </div>
+              <label class="todo-item__checkbox">
+                <input type="checkbox" class="todo-item__completed-checkbox" aria-label="完了にする" data-testid="todo-completed-checkbox" tabindex="-1">
+                <span class="todo-item__checkbox-custom">
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path class="todo-item__check-path" d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </label>
+              <div class="todo-item__content">
+                <span class="todo-item__title" data-testid="todo-title">{title}</span>
+                <input type="text" class="todo-item__edit-input" maxlength="200" aria-label="タイトルを編集" data-testid="todo-edit-input" hidden tabindex="-1">
+                <div class="todo-item__meta">
+                  <time class="todo-item__time todo-item__time--created" datetime="{iso}" data-testid="todo-created-at">{relative/absolute}</time>
+                  <time class="todo-item__time todo-item__time--updated" datetime="{iso}" data-testid="todo-updated-at">更新: {relative/absolute}</time>
+                </div>
+              </div>
+              <div class="todo-item__actions">
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--favorite" aria-label="お気に入り" aria-pressed="false" data-testid="todo-favorite-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5l2 4 4.5.7-3.2 3.1.8 4.5L8 11.5l-4.1 2.3.8-4.5L1.5 6.2 6 5.5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                </button>
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--copy" aria-label="タイトルをコピー" data-testid="todo-copy-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M3 11V3a1.5 1.5 0 011.5-1.5H11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </button>
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--duplicate" aria-label="複製" data-testid="todo-duplicate-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="4" y="4" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="2" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
+                </button>
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--detail" aria-label="詳細を表示" data-testid="todo-detail-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v.5M8 7v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--pomodoro" aria-label="ポモドーロに紐付け" data-testid="todo-pomodoro-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="9" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 6v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 2.5a6 6 0 015 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                </button>
+                <button type="button" class="todo-item__action-btn todo-item__action-btn--delete" aria-label="削除" data-testid="todo-delete-btn" tabindex="-1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M4.5 4l.6 8.5a1.5 1.5 0 001.5 1.4h2.8a1.5 1.5 0 001.5-1.4L11.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </li>
+            -->
+          </ul>
+
+          <!-- カードグリッド表示 (#332, #333) -->
+          <div id="todo-card-grid" class="todo-card-grid" role="list" aria-label="Todoカード一覧" hidden data-testid="todo-card-grid">
+            <!-- JS側で動的生成 -->
+          </div>
+
+          <!-- 空リスト (#52, #295, #330) -->
+          <div id="empty-state" class="empty-state" hidden data-testid="empty-state">
+            <div class="empty-state__illustration" aria-hidden="true">
+              <svg viewBox="0 0 200 160" width="200" height="160" fill="none">
+                <rect x="40" y="30" width="120" height="100" rx="12" stroke="currentColor" stroke-width="2" stroke-dasharray="6 4" opacity="0.3"/>
+                <circle cx="100" cy="65" r="18" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                <path d="M92 65l5 5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+                <path d="M70 100h60" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.2"/>
+                <path d="M80 112h40" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.15"/>
+              </svg>
+            </div>
+            <h2 class="empty-state__title">タスクがありません</h2>
+            <p class="empty-state__description">上の入力欄から最初のタスクを追加しましょう。</p>
+            <button type="button" id="empty-state-add-btn" class="empty-state__cta" data-testid="empty-state-add-btn" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <span>タスクを追加</span>
+            </button>
+          </div>
+
+          <!-- プルダウンリフレッシュインジケータ (#217, #218) -->
+          <div id="pull-refresh-indicator" class="pull-refresh-indicator" aria-hidden="true" hidden>
+            <div class="pull-refresh-indicator__spinner"></div>
+            <span class="pull-refresh-indicator__text">引っ張って更新</span>
+          </div>
+        </section>
+
+        <!-- ページネーション (#29, #33-36) -->
+        <nav id="pagination" class="pagination" aria-label="ページネーション" data-testid="pagination" hidden>
+          <div class="pagination__controls">
+            <button type="button" id="page-first" class="pagination__btn" aria-label="先頭ページ" disabled data-testid="page-first" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M9 3L4 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 3L8 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" id="page-prev" class="pagination__btn" aria-label="前のページ" disabled data-testid="page-prev" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div id="page-numbers" class="pagination__numbers" role="group" aria-label="ページ番号" data-testid="page-numbers">
+              <!-- JS側で動的生成 -->
+            </div>
+            <button type="button" id="page-next" class="pagination__btn" aria-label="次のページ" disabled data-testid="page-next" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" id="page-last" class="pagination__btn" aria-label="末尾ページ" disabled data-testid="page-last" tabindex="0">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M7 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <!-- ページ番号直接入力 (#36) -->
+            <div class="pagination__jump">
+              <label class="pagination__jump-label" for="page-jump-input">
+                <span class="visually-hidden">ページ番号入力</span>
+              </label>
+              <input type="number" id="page-jump-input" class="pagination__jump-input" min="1" placeholder="#" aria-label="ページ番号を入力してジャンプ" data-testid="page-jump-input" tabindex="0">
+              <button type="button" id="page-jump-btn" class="pagination__jump-btn" aria-label="移動" data-testid="page-jump-btn" tabindex="0">移動</button>
+            </div>
+          </div>
+        </nav>
+
+        <!-- 「もっと見る」ボタン (#32) -->
+        <div id="load-more-container" class="load-more" hidden data-testid="load-more">
+          <button type="button" id="load-more-btn" class="load-more__btn" data-testid="load-more-btn" tabindex="0">
+            <span class="load-more__text">もっと見る</span>
+            <span class="load-more__spinner" hidden aria-hidden="true"></span>
+          </button>
+        </div>
+
+      </main>
+
+      <!-- 操作履歴パネル (#157, #158) -->
+      <aside id="history-panel" class="history-panel" aria-label="操作履歴" hidden data-testid="history-panel">
+        <div class="history-panel__header">
+          <h2 class="history-panel__title">操作履歴</h2>
+          <button type="button" id="history-clear-btn" class="history-panel__clear-btn" aria-label="操作履歴をクリア" data-testid="history-clear-btn" tabindex="0">クリア</button>
+          <button type="button" id="history-close-btn" class="history-panel__close-btn" aria-label="操作履歴を閉じる" data-testid="history-close-btn" tabindex="0">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <ul id="history-list" class="history-panel__list" role="list" data-testid="history-list">
+          <!-- JS側で動的生成 -->
+        </ul>
+      </aside>
+
+    </div>
+
+    <!-- フッター (#199, #258, #284, #299, #300, #134) -->
+    <footer class="app-footer" role="contentinfo" data-testid="app-footer">
+      <div class="app-footer__left">
+        <span class="app-footer__version" data-testid="app-version">v1.0.0</span>
+        <span class="app-footer__separator" aria-hidden="true">·</span>
+        <span id="db-status" class="app-footer__db-status" data-testid="db-status">DB接続: 確認中...</span>
+        <span class="app-footer__separator" aria-hidden="true">·</span>
+        <span id="timezone-display" class="app-footer__timezone" data-testid="timezone-display">JST</span>
+      </div>
+      <div class="app-footer__center">
+        <span id="last-operation-time" class="app-footer__last-op" data-testid="last-operation-time"></span>
+      </div>
+      <div class="app-footer__right">
+        <span id="build-hash" class="app-footer__build-hash" data-testid="build-hash"></span>
+        <button type="button" id="history-panel-toggle" class="app-footer__icon-btn" aria-label="操作履歴パネルを開く" data-testid="history-panel-toggle" tabindex="0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 2v3h3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <!-- FPSモニター (#496) -->
+        <span id="fps-monitor" class="app-footer__fps" aria-hidden="true" hidden data-testid="fps-monitor">-- FPS</span>
+      </div>
+    </footer>
+
+  </div><!-- /#app -->
+
+  <!-- モバイルフローティング追加ボタン (#219, #220) -->
+  <button type="button" id="mobile-fab" class="mobile-fab" aria-label="新しいタスクを追加" data-testid="mobile-fab" tabindex="0">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+  </button>
+
+  <!-- モバイルボトムナビゲーション (#389) -->
+  <nav id="bottom-nav" class="bottom-nav" aria-label="モバイルナビゲーション" data-testid="bottom-nav">
+    <button type="button" class="bottom-nav__item bottom-nav__item--active" data-tab="list" aria-label="リスト" aria-current="true" data-testid="bnav-list" tabindex="0">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>リスト</span>
+    </button>
+    <button type="button" class="bottom-nav__item" data-tab="filter" aria-label="フィルタ" data-testid="bnav-filter" tabindex="0">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 4h16l-6 7v5l-4 2v-7L2 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span>フィルタ</span>
+    </button>
+    <button type="button" class="bottom-nav__item" data-tab="stats" aria-label="統計" data-testid="bnav-stats" tabindex="0">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="10" width="4" height="8" rx="0.5" stroke="currentColor" stroke-width="1.3"/><rect x="8" y="6" width="4" height="12" rx="0.5" stroke="currentColor" stroke-width="1.3"/><rect x="14" y="2" width="4" height="16" rx="0.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      <span>統計</span>
+    </button>
+    <button type="button" class="bottom-nav__item" data-tab="settings" aria-label="設定" data-testid="bnav-settings" tabindex="0">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span>設定</span>
+    </button>
+  </nav>
+
+  <!-- ============================== -->
+  <!--       モーダル・オーバーレイ      -->
+  <!-- ============================== -->
+
+  <!-- 削除確認モーダル (#45, #46) -->
+  <div id="confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" hidden data-testid="confirm-modal">
+    <div class="modal__backdrop" data-testid="confirm-modal-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        <h2 id="confirm-modal-title" class="modal__title">確認</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="confirm-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p id="confirm-modal-message" class="modal__message" data-testid="confirm-modal-message"></p>
+        <!-- 大量削除時のプレビュー (#353, #480) -->
+        <div id="confirm-modal-preview" class="modal__preview" hidden data-testid="confirm-modal-preview">
+          <ul id="confirm-modal-preview-list" class="modal__preview-list"></ul>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="confirm-modal-cancel" class="modal__btn modal__btn--secondary" data-testid="confirm-modal-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="confirm-modal-ok" class="modal__btn modal__btn--primary" data-testid="confirm-modal-ok" tabindex="0">実行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Todo詳細モーダル (#109-118) -->
+  <div id="detail-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title" hidden data-testid="detail-modal">
+    <div class="modal__backdrop" data-testid="detail-modal-backdrop"></div>
+    <div class="modal__container modal__container--detail">
+      <div class="modal__header">
+        <h2 id="detail-modal-title" class="modal__title">Todo詳細</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="detail-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="detail-modal__field">
+          <label class="detail-modal__label">ID</label>
+          <code id="detail-id" class="detail-modal__value detail-modal__value--mono" data-testid="detail-id"></code>
+        </div>
+        <div class="detail-modal__field">
+          <label class="detail-modal__label" for="detail-title-input">タイトル</label>
+          <div class="detail-modal__title-wrap">
+            <input type="text" id="detail-title-input" class="detail-modal__title-input" maxlength="200" aria-label="タイトル編集" data-testid="detail-title-input" tabindex="0">
+            <span id="detail-char-counter" class="detail-modal__char-counter">0 / 200</span>
+          </div>
+        </div>
+        <div class="detail-modal__field">
+          <label class="detail-modal__label">完了状態</label>
+          <label class="detail-modal__toggle">
+            <input type="checkbox" id="detail-completed-toggle" class="detail-modal__toggle-input" data-testid="detail-completed-toggle" tabindex="0">
+            <span class="detail-modal__toggle-switch"></span>
+            <span id="detail-completed-text" class="detail-modal__toggle-text">未完了</span>
+          </label>
+        </div>
+        <div class="detail-modal__field">
+          <label class="detail-modal__label">作成日時</label>
+          <time id="detail-created-at" class="detail-modal__value" data-testid="detail-created-at"></time>
+        </div>
+        <div class="detail-modal__field">
+          <label class="detail-modal__label">更新日時</label>
+          <time id="detail-updated-at" class="detail-modal__value" data-testid="detail-updated-at"></time>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="detail-delete-btn" class="modal__btn modal__btn--danger" data-testid="detail-delete-btn" tabindex="0">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 3.5h10M5 3.5V2.5a1 1 0 011-1h2a1 1 0 011 1v1M3.5 3.5l.7 8.5a1 1 0 001 .9h3.6a1 1 0 001-.9l.7-8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          削除
+        </button>
+        <button type="button" id="detail-save-btn" class="modal__btn modal__btn--primary" data-testid="detail-save-btn" tabindex="0">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 設定モーダル (#197, #198, #83-90, #131-138, #227-228, #259-260, #311-320, #344, #363-364, #372, #489-496) -->
+  <div id="settings-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" hidden data-testid="settings-modal">
+    <div class="modal__backdrop" data-testid="settings-modal-backdrop"></div>
+    <div class="modal__container modal__container--settings">
+      <div class="modal__header">
+        <h2 id="settings-modal-title" class="modal__title">設定</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="settings-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body modal__body--settings">
+        <!-- テーマ・外観 -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">外観</legend>
+
+          <div class="settings__item">
+            <label class="settings__label" for="settings-theme">テーマ</label>
+            <div class="settings__control">
+              <select id="settings-theme" class="settings__select" data-testid="settings-theme" tabindex="0">
+                <option value="system">システム設定に従う</option>
+                <option value="light">ライト</option>
+                <option value="dark">ダーク</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings__item">
+            <label class="settings__label">カラーテーマ</label>
+            <div class="settings__control settings__color-themes" role="radiogroup" aria-label="カラーテーマ選択" data-testid="settings-color-theme">
+              <label class="settings__color-swatch" title="デフォルト">
+                <input type="radio" name="colorTheme" value="default" checked tabindex="0">
+                <span class="settings__color-swatch-visual" style="--swatch-primary:#4f6df5;--swatch-bg:#fafaf9"></span>
+              </label>
+              <label class="settings__color-swatch" title="フォレスト">
+                <input type="radio" name="colorTheme" value="forest" tabindex="-1">
+                <span class="settings__color-swatch-visual" style="--swatch-primary:#2d8a56;--swatch-bg:#f6faf7"></span>
+              </label>
+              <label class="settings__color-swatch" title="サンセット">
+                <input type="radio" name="colorTheme" value="sunset" tabindex="-1">
+                <span class="settings__color-swatch-visual" style="--swatch-primary:#e06c48;--swatch-bg:#fdf8f5"></span>
+              </label>
+              <label class="settings__color-swatch" title="オーシャン">
+                <input type="radio" name="colorTheme" value="ocean" tabindex="-1">
+                <span class="settings__color-swatch-visual" style="--swatch-primary:#2896b5;--swatch-bg:#f4fafb"></span>
+              </label>
+              <label class="settings__color-swatch" title="ラベンダー">
+                <input type="radio" name="colorTheme" value="lavender" tabindex="-1">
+                <span class="settings__color-swatch-visual" style="--swatch-primary:#8b5fd4;--swatch-bg:#f9f6fd"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="settings__item">
+            <label class="settings__label" for="settings-font-size">フォントサイズ</label>
+            <div class="settings__control">
+              <select id="settings-font-size" class="settings__select" data-testid="settings-font-size" tabindex="0">
+                <option value="small">小</option>
+                <option value="medium" selected>中</option>
+                <option value="large">大</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings__item">
+            <label class="settings__label" for="settings-density">表示密度</label>
+            <div class="settings__control">
+              <select id="settings-density" class="settings__select" data-testid="settings-density" tabindex="0">
+                <option value="compact">コンパクト</option>
+                <option value="normal" selected>通常</option>
+                <option value="comfortable">ゆったり</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings__item">
+            <label class="settings__label">高コントラストモード</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-high-contrast" data-testid="settings-high-contrast" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 時刻表示 -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">時刻表示</legend>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-time-display">デフォルト表示</label>
+            <div class="settings__control">
+              <select id="settings-time-display" class="settings__select" data-testid="settings-time-display" tabindex="0">
+                <option value="relative">相対時刻（3時間前）</option>
+                <option value="absolute">絶対時刻（2026-04-15 18:00）</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-time-format">時刻形式</label>
+            <div class="settings__control">
+              <select id="settings-time-format" class="settings__select" data-testid="settings-time-format" tabindex="0">
+                <option value="24h">24時間表記</option>
+                <option value="12h">12時間表記（AM/PM）</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 入力設定 -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">入力</legend>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-submit-key">追加キー</label>
+            <div class="settings__control">
+              <select id="settings-submit-key" class="settings__select" data-testid="settings-submit-key" tabindex="0">
+                <option value="ctrl-enter">Ctrl+Enter</option>
+                <option value="enter">Enter</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 言語 (#311-320) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">言語</legend>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-language">表示言語</label>
+            <div class="settings__control">
+              <select id="settings-language" class="settings__select" data-testid="settings-language" tabindex="0">
+                <option value="ja">日本語</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 通知 (#221-228) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">通知</legend>
+          <div class="settings__item">
+            <label class="settings__label">ブラウザ通知</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-notifications" data-testid="settings-notifications" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-notification-interval">通知頻度</label>
+            <div class="settings__control">
+              <select id="settings-notification-interval" class="settings__select" data-testid="settings-notification-interval" tabindex="0">
+                <option value="5">5分</option>
+                <option value="15" selected>15分</option>
+                <option value="30">30分</option>
+                <option value="60">1時間</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- ポモドーロ設定 (#364) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">ポモドーロ</legend>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-pomodoro-work">作業時間（分）</label>
+            <div class="settings__control">
+              <input type="number" id="settings-pomodoro-work" class="settings__number-input" min="1" max="120" value="25" data-testid="settings-pomodoro-work" tabindex="0">
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-pomodoro-break">休憩時間（分）</label>
+            <div class="settings__control">
+              <input type="number" id="settings-pomodoro-break" class="settings__number-input" min="1" max="60" value="5" data-testid="settings-pomodoro-break" tabindex="0">
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 音声認識 (#304) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">音声入力</legend>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-speech-lang">認識言語</label>
+            <div class="settings__control">
+              <select id="settings-speech-lang" class="settings__select" data-testid="settings-speech-lang" tabindex="0">
+                <option value="ja-JP">日本語</option>
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Realtime (#184) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">同期</legend>
+          <div class="settings__item">
+            <label class="settings__label">リアルタイム同期</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-realtime" checked data-testid="settings-realtime" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label">自動リフレッシュ</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-auto-refresh" data-testid="settings-auto-refresh" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label" for="settings-refresh-interval">リフレッシュ間隔</label>
+            <div class="settings__control">
+              <select id="settings-refresh-interval" class="settings__select" data-testid="settings-refresh-interval" tabindex="0">
+                <option value="60">1分</option>
+                <option value="300" selected>5分</option>
+                <option value="600">10分</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 開発者向け (#376, #380, #381, #489-496) -->
+        <fieldset class="settings__group">
+          <legend class="settings__group-title">開発者向け</legend>
+          <div class="settings__item">
+            <label class="settings__label">FPSモニター</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-fps-monitor" data-testid="settings-fps-monitor" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label">操作ログ出力</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-debug-log" checked data-testid="settings-debug-log" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+          <div class="settings__item">
+            <label class="settings__label">パフォーマンスパネル</label>
+            <div class="settings__control">
+              <label class="settings__toggle">
+                <input type="checkbox" id="settings-perf-panel" data-testid="settings-perf-panel" tabindex="0">
+                <span class="settings__toggle-switch"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- エラーログ (#277, #278, #279) -->
+          <div class="settings__item settings__item--block">
+            <button type="button" id="show-error-log-btn" class="settings__action-btn" data-testid="show-error-log-btn" tabindex="0">エラーログを表示</button>
+          </div>
+
+          <!-- APIリクエストログ (#492) -->
+          <div class="settings__item settings__item--block">
+            <button type="button" id="show-api-log-btn" class="settings__action-btn" data-testid="show-api-log-btn" tabindex="0">APIログを表示</button>
+          </div>
+
+          <!-- 接続情報 (#489) -->
+          <div class="settings__item settings__item--block">
+            <div class="settings__info-block" data-testid="connection-info">
+              <span class="settings__info-label">Supabase URL:</span>
+              <code id="settings-supabase-url" class="settings__info-value">****</code>
+            </div>
+          </div>
+
+          <!-- ブラウザ情報 (#494) -->
+          <div class="settings__item settings__item--block">
+            <div class="settings__info-block" data-testid="browser-info">
+              <span class="settings__info-label">ブラウザ:</span>
+              <code id="settings-browser-info" class="settings__info-value"></code>
+            </div>
+          </div>
+
+          <!-- localStorage使用量 (#235, #491) -->
+          <div class="settings__item settings__item--block">
+            <div class="settings__info-block" data-testid="storage-usage">
+              <span class="settings__info-label">localStorage:</span>
+              <div class="settings__storage-bar">
+                <div id="storage-bar-fill" class="settings__storage-bar-fill" style="width:0%"></div>
+              </div>
+              <code id="settings-storage-usage" class="settings__info-value">0 KB / 5 MB</code>
+            </div>
+          </div>
+
+          <!-- バグ報告用一括コピー (#495) -->
+          <div class="settings__item settings__item--block">
+            <button type="button" id="copy-debug-info-btn" class="settings__action-btn" data-testid="copy-debug-info-btn" tabindex="0">デバッグ情報をコピー</button>
+          </div>
+
+          <!-- localStorage設定エクスポート/インポート (#236, #237) -->
+          <div class="settings__item settings__item--block settings__item--row">
+            <button type="button" id="export-settings-btn" class="settings__action-btn" data-testid="export-settings-btn" tabindex="0">設定エクスポート</button>
+            <button type="button" id="import-settings-btn" class="settings__action-btn" data-testid="import-settings-btn" tabindex="0">設定インポート</button>
+          </div>
+        </fieldset>
+
+      </div>
+      <div class="modal__footer modal__footer--settings">
+        <!-- チュートリアル再表示 (#293) -->
+        <button type="button" id="restart-tutorial-btn" class="modal__btn modal__btn--secondary" data-testid="restart-tutorial-btn" tabindex="0">チュートリアルを再表示</button>
+        <!-- 全設定リセット (#198) -->
+        <button type="button" id="reset-all-settings-btn" class="modal__btn modal__btn--danger" data-testid="reset-all-settings-btn" tabindex="0">全設定リセット</button>
+        <!-- アプリ完全リセット (#497) -->
+        <button type="button" id="full-reset-btn" class="modal__btn modal__btn--danger" data-testid="full-reset-btn" tabindex="0">アプリ完全リセット</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 統計ダッシュボードモーダル (#252, #241-251, #366, #429-434) -->
+  <div id="dashboard-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="dashboard-modal-title" hidden data-testid="dashboard-modal">
+    <div class="modal__backdrop" data-testid="dashboard-modal-backdrop"></div>
+    <div class="modal__container modal__container--dashboard">
+      <div class="modal__header">
+        <h2 id="dashboard-modal-title" class="modal__title">統計ダッシュボード</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="dashboard-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body modal__body--dashboard">
+        <!-- 活動サマリー (#248) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">直近7日間の活動</h3>
+          <div id="dashboard-weekly-summary" class="dashboard__weekly-summary" data-testid="dashboard-weekly-summary">
+            <!-- JS側で動的生成 -->
+          </div>
+        </div>
+
+        <!-- 日別作成件数 (#72) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">日別作成件数</h3>
+          <div id="dashboard-daily-chart" class="dashboard__chart" data-testid="dashboard-daily-chart" aria-label="日別作成件数グラフ">
+            <!-- CSS/SVGで描画 -->
+          </div>
+        </div>
+
+        <!-- 週別作成件数 (#241) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">週別作成件数</h3>
+          <div id="dashboard-weekly-chart" class="dashboard__chart" data-testid="dashboard-weekly-chart" aria-label="週別作成件数グラフ"></div>
+        </div>
+
+        <!-- 月別作成件数 (#242) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">月別作成件数</h3>
+          <div id="dashboard-monthly-chart" class="dashboard__chart" data-testid="dashboard-monthly-chart" aria-label="月別作成件数グラフ"></div>
+        </div>
+
+        <!-- 曜日別傾向 (#243) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">曜日別作成傾向</h3>
+          <div id="dashboard-weekday-chart" class="dashboard__chart" data-testid="dashboard-weekday-chart" aria-label="曜日別作成傾向グラフ"></div>
+        </div>
+
+        <!-- 時間帯別傾向 (#244) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">時間帯別作成傾向</h3>
+          <div id="dashboard-hourly-chart" class="dashboard__chart" data-testid="dashboard-hourly-chart" aria-label="時間帯別作成傾向グラフ"></div>
+        </div>
+
+        <!-- 完了率推移 (#245) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">完了率の推移</h3>
+          <div id="dashboard-completion-chart" class="dashboard__chart" data-testid="dashboard-completion-chart" aria-label="完了率推移グラフ"></div>
+        </div>
+
+        <!-- 平均完了所要時間 (#246) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">平均完了所要時間</h3>
+          <p id="dashboard-avg-completion-time" class="dashboard__stat-value" data-testid="dashboard-avg-completion-time">--</p>
+        </div>
+
+        <!-- 最長未完了Todo (#247) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">最長未完了タスク</h3>
+          <p id="dashboard-oldest-active" class="dashboard__stat-value" data-testid="dashboard-oldest-active">--</p>
+        </div>
+
+        <!-- ストリーク (#249, #250) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">連続完了ストリーク</h3>
+          <div id="dashboard-streak-info" class="dashboard__streak" data-testid="dashboard-streak-info">
+            <span class="dashboard__streak-count" id="dashboard-streak-count">0日</span>
+            <div id="dashboard-badges" class="dashboard__badges" data-testid="dashboard-badges">
+              <!-- バッジ (#405, #406) -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ポモドーロ週間グラフ (#366) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">ポモドーロ（直近7日）</h3>
+          <div id="dashboard-pomodoro-chart" class="dashboard__chart" data-testid="dashboard-pomodoro-chart" aria-label="ポモドーロ回数グラフ"></div>
+        </div>
+
+        <!-- タイトル文字数分布 (#251) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">タイトル文字数分布</h3>
+          <div id="dashboard-title-length-chart" class="dashboard__chart" data-testid="dashboard-title-length-chart" aria-label="タイトル文字数分布グラフ"></div>
+        </div>
+
+        <!-- ワードクラウド (#429, #430, #431) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">頻出ワード</h3>
+          <div id="dashboard-word-cloud" class="dashboard__word-cloud" data-testid="dashboard-word-cloud" aria-label="ワードクラウド"></div>
+        </div>
+
+        <!-- 重複タイトル (#433, #434) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">重複タイトル</h3>
+          <div id="dashboard-duplicates" class="dashboard__duplicates" data-testid="dashboard-duplicates"></div>
+        </div>
+
+        <!-- 類似タイトル (#432) -->
+        <div class="dashboard__section">
+          <h3 class="dashboard__section-title">類似タイトル</h3>
+          <div id="dashboard-similar" class="dashboard__similar" data-testid="dashboard-similar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ヘルプモーダル (#291, #296) -->
+  <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title" hidden data-testid="help-modal">
+    <div class="modal__backdrop" data-testid="help-modal-backdrop"></div>
+    <div class="modal__container modal__container--help">
+      <div class="modal__header">
+        <h2 id="help-modal-title" class="modal__title">ヘルプ</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="help-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="help__section">
+          <h3 class="help__section-title">基本操作</h3>
+          <dl class="help__list">
+            <dt>タスク追加</dt><dd>入力欄にタイトルを入力し、追加ボタンまたはCtrl+Enterで追加</dd>
+            <dt>完了/未完了</dt><dd>チェックボックスをクリック、またはSpaceキーで切り替え</dd>
+            <dt>インライン編集</dt><dd>タイトルをダブルクリックして編集。Enterで確定、Escでキャンセル</dd>
+            <dt>削除</dt><dd>ゴミ箱アイコンまたはDeleteキーで削除（確認ダイアログあり）</dd>
+            <dt>詳細表示</dt><dd>ℹアイコンまたはTodo要素をクリックして詳細モーダルを表示</dd>
+            <dt>右クリックメニュー</dt><dd>Todo上で右クリックして編集・削除・複製等のメニューを表示</dd>
+          </dl>
+        </div>
+        <div class="help__section">
+          <h3 class="help__section-title">検索構文</h3>
+          <dl class="help__list">
+            <dt>AND検索</dt><dd>スペース区切りで全キーワードを含む（例: 買い物 牛乳）</dd>
+            <dt>OR検索</dt><dd>「OR」で区切り（例: 買い物 OR 掃除）</dd>
+            <dt>NOT検索</dt><dd>マイナスで除外（例: -完了）</dd>
+            <dt>完全一致</dt><dd>ダブルクォートで囲む（例: "買い物リスト"）</dd>
+          </dl>
+        </div>
+        <div class="help__section">
+          <h3 class="help__section-title" id="shortcuts-title">キーボードショートカット</h3>
+          <table class="help__shortcuts" aria-labelledby="shortcuts-title">
+            <thead><tr><th>キー</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>コマンドパレット</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Enter</kbd></td><td>Todo追加</td></tr>
+              <tr><td><kbd>/</kbd></td><td>検索にフォーカス</td></tr>
+              <tr><td><kbd>?</kbd></td><td>ショートカット一覧</td></tr>
+              <tr><td><kbd>F</kbd></td><td>集中モード切替</td></tr>
+              <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>リスト内移動</td></tr>
+              <tr><td><kbd>Space</kbd></td><td>完了トグル</td></tr>
+              <tr><td><kbd>Delete</kbd></td><td>削除</td></tr>
+              <tr><td><kbd>Enter</kbd></td><td>編集確定</td></tr>
+              <tr><td><kbd>Escape</kbd></td><td>編集キャンセル / モーダルを閉じる</td></tr>
+              <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>元に戻す (Undo)</td></tr>
+              <tr><td><kbd>1</kbd>-<kbd>9</kbd></td><td>保存済みフィルタ切替</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="help__section">
+          <h3 class="help__section-title">モバイル操作</h3>
+          <dl class="help__list">
+            <dt>左スワイプ</dt><dd>削除</dd>
+            <dt>右スワイプ</dt><dd>完了トグル</dd>
+            <dt>長押し</dt><dd>ドラッグで並べ替え</dd>
+            <dt>プルダウン</dt><dd>リスト更新</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- エラーログモーダル (#278, #279) -->
+  <div id="error-log-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="error-log-modal-title" hidden data-testid="error-log-modal">
+    <div class="modal__backdrop" data-testid="error-log-modal-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        <h2 id="error-log-modal-title" class="modal__title">エラーログ</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="error-log-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div id="error-log-list" class="error-log__list" data-testid="error-log-list">
+          <p class="error-log__empty">エラーログはありません</p>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="error-log-copy-btn" class="modal__btn modal__btn--secondary" data-testid="error-log-copy-btn" tabindex="0">コピー</button>
+        <button type="button" id="error-log-export-btn" class="modal__btn modal__btn--secondary" data-testid="error-log-export-btn" tabindex="0">JSONダウンロード</button>
+        <button type="button" id="error-log-clear-btn" class="modal__btn modal__btn--danger" data-testid="error-log-clear-btn" tabindex="0">クリア</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APIログモーダル (#492) -->
+  <div id="api-log-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="api-log-modal-title" hidden data-testid="api-log-modal">
+    <div class="modal__backdrop" data-testid="api-log-modal-backdrop"></div>
+    <div class="modal__container modal__container--wide">
+      <div class="modal__header">
+        <h2 id="api-log-modal-title" class="modal__title">APIリクエストログ</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="api-log-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="api-log__summary" data-testid="api-log-summary">
+          <span>リクエスト数: <strong id="api-log-count">0</strong></span>
+          <span>転送量概算: <strong id="api-log-transfer">0 KB</strong></span>
+        </div>
+        <div id="api-log-list" class="api-log__list" data-testid="api-log-list">
+          <p class="api-log__empty">ログはありません</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- パフォーマンスパネル (#384) -->
+  <div id="perf-panel" class="perf-panel" aria-label="パフォーマンス計測" hidden data-testid="perf-panel">
+    <div class="perf-panel__header">
+      <span class="perf-panel__title">Perf</span>
+      <button type="button" id="perf-panel-close" class="perf-panel__close" aria-label="閉じる" data-testid="perf-panel-close" tabindex="0">×</button>
+    </div>
+    <div id="perf-panel-list" class="perf-panel__list" data-testid="perf-panel-list"></div>
+  </div>
+
+  <!-- エラーモーダル (#271, #272, #273) -->
+  <div id="error-modal" class="modal" role="alertdialog" aria-modal="true" aria-labelledby="error-modal-title" hidden data-testid="error-modal">
+    <div class="modal__backdrop" data-testid="error-modal-backdrop"></div>
+    <div class="modal__container modal__container--error">
+      <div class="modal__header modal__header--error">
+        <h2 id="error-modal-title" class="modal__title">エラーが発生しました</h2>
+      </div>
+      <div class="modal__body">
+        <p id="error-modal-message" class="modal__message" data-testid="error-modal-message"></p>
+        <details class="error-modal__details">
+          <summary>詳細情報</summary>
+          <pre id="error-modal-stack" class="error-modal__stack" data-testid="error-modal-stack"></pre>
+        </details>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="error-modal-close" class="modal__btn modal__btn--secondary" data-testid="error-modal-close-btn" tabindex="0">閉じる</button>
+        <button type="button" id="error-modal-retry" class="modal__btn modal__btn--primary" data-testid="error-modal-retry-btn" tabindex="0">再試行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 競合解決モーダル (#348) -->
+  <div id="conflict-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="conflict-modal-title" hidden data-testid="conflict-modal">
+    <div class="modal__backdrop" data-testid="conflict-modal-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        <h2 id="conflict-modal-title" class="modal__title">更新の競合</h2>
+      </div>
+      <div class="modal__body">
+        <p class="modal__message">このTodoは他のタブまたは端末で更新されています。</p>
+        <div class="conflict-modal__comparison">
+          <div class="conflict-modal__version">
+            <h3>あなたの変更</h3>
+            <p id="conflict-local-value" data-testid="conflict-local-value"></p>
+          </div>
+          <div class="conflict-modal__version">
+            <h3>サーバー版</h3>
+            <p id="conflict-remote-value" data-testid="conflict-remote-value"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="conflict-cancel" class="modal__btn modal__btn--secondary" data-testid="conflict-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="conflict-use-remote" class="modal__btn modal__btn--secondary" data-testid="conflict-use-remote" tabindex="0">サーバー版を採用</button>
+        <button type="button" id="conflict-use-local" class="modal__btn modal__btn--primary" data-testid="conflict-use-local" tabindex="0">上書き保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- インポートプレビューモーダル (#418, #419, #420) -->
+  <div id="import-preview-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="import-preview-title" hidden data-testid="import-preview-modal">
+    <div class="modal__backdrop" data-testid="import-preview-backdrop"></div>
+    <div class="modal__container modal__container--wide">
+      <div class="modal__header">
+        <h2 id="import-preview-title" class="modal__title">インポートプレビュー</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="import-preview-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="import-preview__summary" data-testid="import-preview-summary">
+          <span>合計: <strong id="import-total">0</strong>件</span>
+          <span>重複: <strong id="import-duplicates">0</strong>件</span>
+        </div>
+        <label class="import-preview__option">
+          <input type="checkbox" id="import-skip-duplicates" checked data-testid="import-skip-duplicates" tabindex="0">
+          <span>重複をスキップ</span>
+        </label>
+        <div id="import-preview-table" class="import-preview__table" data-testid="import-preview-table">
+          <!-- JS側で動的生成 -->
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="import-cancel-btn" class="modal__btn modal__btn--secondary" data-testid="import-cancel-btn" tabindex="0">キャンセル</button>
+        <button type="button" id="import-execute-btn" class="modal__btn modal__btn--primary" data-testid="import-execute-btn" tabindex="0">インポート実行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRコードモーダル (#190) -->
+  <div id="qr-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title" hidden data-testid="qr-modal">
+    <div class="modal__backdrop" data-testid="qr-modal-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="qr-modal-title" class="modal__title">QRコード</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="qr-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body modal__body--center">
+        <canvas id="qr-canvas" class="qr-modal__canvas" width="256" height="256" data-testid="qr-canvas" aria-label="現在のURLのQRコード"></canvas>
+        <p id="qr-url-display" class="qr-modal__url" data-testid="qr-url-display"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 音声認識確認モーダル (#307) -->
+  <div id="voice-confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="voice-confirm-title" hidden data-testid="voice-confirm-modal">
+    <div class="modal__backdrop" data-testid="voice-confirm-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="voice-confirm-title" class="modal__title">音声認識結果</h2>
+      </div>
+      <div class="modal__body">
+        <input type="text" id="voice-result-input" class="voice-confirm__input" aria-label="認識テキストの修正" data-testid="voice-result-input" tabindex="0">
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="voice-confirm-cancel" class="modal__btn modal__btn--secondary" data-testid="voice-confirm-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="voice-confirm-add" class="modal__btn modal__btn--primary" data-testid="voice-confirm-add" tabindex="0">追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- バッジ獲得モーダル (#407) -->
+  <div id="badge-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="badge-modal-title" hidden data-testid="badge-modal">
+    <div class="modal__backdrop" data-testid="badge-modal-backdrop"></div>
+    <div class="modal__container modal__container--small modal__container--badge">
+      <div class="modal__body modal__body--center">
+        <div id="badge-modal-icon" class="badge-modal__icon" data-testid="badge-modal-icon" aria-hidden="true"></div>
+        <h2 id="badge-modal-title" class="badge-modal__title">バッジ獲得！</h2>
+        <p id="badge-modal-description" class="badge-modal__description" data-testid="badge-modal-description"></p>
+        <button type="button" id="badge-modal-close" class="modal__btn modal__btn--primary" data-testid="badge-modal-close" tabindex="0">やったね！</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- デイリー目標達成演出 (#403) -->
+  <div id="confetti-canvas" class="confetti-canvas" aria-hidden="true" hidden data-testid="confetti-canvas"></div>
+
+  <!-- レベルアップ演出 (#412) -->
+  <div id="levelup-overlay" class="levelup-overlay" aria-live="polite" hidden data-testid="levelup-overlay">
+    <div class="levelup-overlay__content">
+      <span class="levelup-overlay__text">Level Up!</span>
+      <span id="levelup-level" class="levelup-overlay__level"></span>
+    </div>
+  </div>
+
+  <!-- コマンドパレット (#459-470) -->
+  <div id="command-palette" class="command-palette" role="dialog" aria-modal="true" aria-label="コマンドパレット" hidden data-testid="command-palette">
+    <div class="command-palette__backdrop" data-testid="command-palette-backdrop"></div>
+    <div class="command-palette__container">
+      <div class="command-palette__input-wrap">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="command-palette__icon" aria-hidden="true">
+          <circle cx="7.5" cy="7.5" r="5" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M11.5 11.5L16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <input
+          type="text"
+          id="command-palette-input"
+          class="command-palette__input"
+          placeholder="コマンドを入力..."
+          autocomplete="off"
+          aria-label="コマンド入力"
+          data-testid="command-palette-input"
+          tabindex="0"
+        >
+        <kbd class="command-palette__esc-hint">Esc</kbd>
+      </div>
+      <ul id="command-palette-results" class="command-palette__results" role="listbox" aria-label="コマンド候補" data-testid="command-palette-results">
+        <!-- JS側で動的生成 -->
+      </ul>
+      <div class="command-palette__footer">
+        <span><kbd>↑↓</kbd> 移動</span>
+        <span><kbd>Enter</kbd> 実行</span>
+        <span><kbd>Esc</kbd> 閉じる</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- カスタムコンテキストメニュー (#201-210) -->
+  <div id="context-menu" class="context-menu" role="menu" aria-label="コンテキストメニュー" hidden data-testid="context-menu">
+    <button type="button" class="context-menu__item" role="menuitem" data-action="edit" data-testid="ctx-edit" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M10 2l2 2-7 7H3v-2l7-7z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <span>編集</span>
+    </button>
+    <button type="button" class="context-menu__item" role="menuitem" data-action="toggle-complete" data-testid="ctx-toggle" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7.5l3 3 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="ctx-toggle-text">完了にする</span>
+    </button>
+    <button type="button" class="context-menu__item" role="menuitem" data-action="duplicate" data-testid="ctx-duplicate" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="4" y="4" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.1"/><rect x="1" y="1" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.1"/></svg>
+      <span>複製</span>
+    </button>
+    <button type="button" class="context-menu__item" role="menuitem" data-action="copy-title" data-testid="ctx-copy" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="4" y="4" width="8.5" height="8.5" rx="1.2" stroke="currentColor" stroke-width="1.1"/><path d="M2.5 10V2.5a1.2 1.2 0 011.2-1.2H10" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+      <span>タイトルをコピー</span>
+    </button>
+    <button type="button" class="context-menu__item" role="menuitem" data-action="detail" data-testid="ctx-detail" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.1"/><path d="M7 4.5v.5M7 6v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <span>詳細</span>
+    </button>
+    <button type="button" class="context-menu__item" role="menuitem" data-action="pomodoro" data-testid="ctx-pomodoro" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="8" r="5" stroke="currentColor" stroke-width="1.1"/><path d="M7 5.5v2.8l1.8 1.2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>ポモドーロ開始</span>
+    </button>
+    <hr class="context-menu__divider" role="separator">
+    <button type="button" class="context-menu__item context-menu__item--danger" role="menuitem" data-action="delete" data-testid="ctx-delete" tabindex="-1">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 3.5h10M5 3.5V2.5a1 1 0 011-1h2a1 1 0 011 1v1M3.5 3.5l.7 8.5a1 1 0 001 .9h3.6a1 1 0 001-.9l.7-8.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>削除</span>
+    </button>
+  </div>
+
+  <!-- 検索構文ヘルプポップオーバー (#427) -->
+  <div id="search-help-popover" class="popover" role="tooltip" hidden data-testid="search-help-popover">
+    <div class="popover__content">
+      <h4 class="popover__title">検索構文</h4>
+      <dl class="popover__list">
+        <dt><code>キーワード キーワード</code></dt><dd>AND検索（両方含む）</dd>
+        <dt><code>キーワード OR キーワード</code></dt><dd>OR検索（いずれか含む）</dd>
+        <dt><code>-キーワード</code></dt><dd>除外（含まない）</dd>
+        <dt><code>"フレーズ"</code></dt><dd>完全一致</dd>
+      </dl>
+    </div>
+  </div>
+
+  <!-- トースト通知コンテナ (#47-49, #80) -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false" role="log" data-testid="toast-container">
+    <!-- JS側で動的生成。テンプレート構造:
+    <div class="toast toast--success" role="status" data-testid="toast">
+      <div class="toast__icon" aria-hidden="true">
+        <svg>...</svg>
+      </div>
+      <div class="toast__content">
+        <p class="toast__message">Todoを追加しました</p>
+        <button type="button" class="toast__undo-btn" data-testid="toast-undo">元に戻す</button>
+      </div>
+      <button type="button" class="toast__close" aria-label="閉じる" data-testid="toast-close">
+        <svg>...</svg>
+      </button>
+      <div class="toast__timer-bar"></div>
+    </div>
+    -->
+  </div>
+
+  <!-- ARIA ライブリージョン (#80, #285) -->
+  <div id="aria-live-region" class="visually-hidden" aria-live="assertive" aria-atomic="true" data-testid="aria-live-region"></div>
+  <div id="aria-live-polite" class="visually-hidden" aria-live="polite" aria-atomic="true" data-testid="aria-live-polite"></div>
+
+  <!-- 隠しファイルインプット (#94, #95, #237) -->
+  <input type="file" id="file-import-input" accept=".json,.csv" hidden aria-hidden="true" data-testid="file-import-input">
+  <input type="file" id="settings-import-input" accept=".json" hidden aria-hidden="true" data-testid="settings-import-input">
+
+  <!-- PWAインストールバナー (#170) -->
+  <div id="pwa-install-banner" class="pwa-banner" role="complementary" aria-label="アプリインストール" hidden data-testid="pwa-install-banner">
+    <div class="pwa-banner__content">
+      <span class="pwa-banner__text">ホーム画面に追加してオフラインでも使えます</span>
+      <div class="pwa-banner__actions">
+        <button type="button" id="pwa-install-btn" class="pwa-banner__install-btn" data-testid="pwa-install-btn" tabindex="0">インストール</button>
+        <button type="button" id="pwa-dismiss-btn" class="pwa-banner__dismiss-btn" aria-label="閉じる" data-testid="pwa-dismiss-btn" tabindex="0">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 同期結果通知バナー (#174) -->
+  <div id="sync-result-banner" class="sync-banner" role="status" aria-live="polite" hidden data-testid="sync-result-banner">
+    <span id="sync-result-text" data-testid="sync-result-text"></span>
+    <button type="button" id="sync-banner-close" class="sync-banner__close" aria-label="閉じる" data-testid="sync-banner-close" tabindex="0">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <!-- デイリー目標設定モーダル (#401) -->
+  <div id="daily-goal-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="daily-goal-modal-title" hidden data-testid="daily-goal-modal">
+    <div class="modal__backdrop" data-testid="daily-goal-modal-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="daily-goal-modal-title" class="modal__title">今日の目標</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="daily-goal-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <label for="daily-goal-input" class="daily-goal-modal__label">完了目標件数</label>
+        <input type="number" id="daily-goal-input" class="daily-goal-modal__input" min="1" max="100" value="5" data-testid="daily-goal-input" tabindex="0">
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="daily-goal-save" class="modal__btn modal__btn--primary" data-testid="daily-goal-save" tabindex="0">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 条件付き一括操作モーダル (#478, #479) -->
+  <div id="conditional-batch-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="conditional-batch-title" hidden data-testid="conditional-batch-modal">
+    <div class="modal__backdrop" data-testid="conditional-batch-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        <h2 id="conditional-batch-title" class="modal__title">条件付き一括操作</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="conditional-batch-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="conditional-batch__field">
+          <label for="conditional-batch-action">操作</label>
+          <select id="conditional-batch-action" class="settings__select" data-testid="conditional-batch-action" tabindex="0">
+            <option value="complete">完了にする</option>
+            <option value="delete">削除する</option>
+          </select>
+        </div>
+        <div class="conditional-batch__field">
+          <label for="conditional-batch-keyword">タイトルに含む</label>
+          <input type="text" id="conditional-batch-keyword" class="settings__select" placeholder="(任意)" data-testid="conditional-batch-keyword" tabindex="0">
+        </div>
+        <div class="conditional-batch__field">
+          <label for="conditional-batch-status">完了状態</label>
+          <select id="conditional-batch-status" class="settings__select" data-testid="conditional-batch-status" tabindex="0">
+            <option value="any">指定なし</option>
+            <option value="active">未完了のみ</option>
+            <option value="completed">完了のみ</option>
+          </select>
+        </div>
+        <div class="conditional-batch__field">
+          <label for="conditional-batch-days">作成後○日以上</label>
+          <input type="number" id="conditional-batch-days" class="settings__select" min="0" placeholder="(任意)" data-testid="conditional-batch-days" tabindex="0">
+        </div>
+        <div id="conditional-batch-preview" class="conditional-batch__preview" data-testid="conditional-batch-preview">
+          <p>対象: <strong id="conditional-batch-count">0</strong>件</p>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="conditional-batch-cancel" class="modal__btn modal__btn--secondary" data-testid="conditional-batch-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="conditional-batch-preview-btn" class="modal__btn modal__btn--secondary" data-testid="conditional-batch-preview-btn" tabindex="0">プレビュー</button>
+        <button type="button" id="conditional-batch-execute" class="modal__btn modal__btn--primary" data-testid="conditional-batch-execute" tabindex="0">実行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 一括置換モーダル (#266) -->
+  <div id="replace-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="replace-modal-title" hidden data-testid="replace-modal">
+    <div class="modal__backdrop" data-testid="replace-modal-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="replace-modal-title" class="modal__title">一括置換</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="replace-modal-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="replace-modal__field">
+          <label for="replace-search-input">検索文字列</label>
+          <input type="text" id="replace-search-input" class="replace-modal__input" data-testid="replace-search-input" tabindex="0">
+        </div>
+        <div class="replace-modal__field">
+          <label for="replace-with-input">置換文字列</label>
+          <input type="text" id="replace-with-input" class="replace-modal__input" data-testid="replace-with-input" tabindex="0">
+        </div>
+        <p class="replace-modal__count">対象: <strong id="replace-match-count">0</strong>件</p>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="replace-cancel" class="modal__btn modal__btn--secondary" data-testid="replace-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="replace-execute" class="modal__btn modal__btn--primary" data-testid="replace-execute" tabindex="0">置換実行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- フィルタ保存モーダル (#395) -->
+  <div id="save-filter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="save-filter-title" hidden data-testid="save-filter-modal">
+    <div class="modal__backdrop" data-testid="save-filter-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="save-filter-title" class="modal__title">フィルタを保存</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="save-filter-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <label for="filter-name-input">フィルタ名</label>
+        <input type="text" id="filter-name-input" class="save-filter__input" placeholder="例: 今週の未完了" maxlength="50" data-testid="filter-name-input" tabindex="0">
+        <label class="save-filter__default-label">
+          <input type="checkbox" id="filter-set-default" data-testid="filter-set-default" tabindex="0">
+          <span>起動時のデフォルトに設定</span>
+        </label>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="save-filter-cancel" class="modal__btn modal__btn--secondary" data-testid="save-filter-cancel" tabindex="0">キャンセル</button>
+        <button type="button" id="save-filter-save" class="modal__btn modal__btn--primary" data-testid="save-filter-save" tabindex="0">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 複数行ペースト確認モーダル (#148) -->
+  <div id="paste-confirm-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="paste-confirm-title" hidden data-testid="paste-confirm-modal">
+    <div class="modal__backdrop" data-testid="paste-confirm-backdrop"></div>
+    <div class="modal__container modal__container--small">
+      <div class="modal__header">
+        <h2 id="paste-confirm-title" class="modal__title">一括追加の確認</h2>
+      </div>
+      <div class="modal__body">
+        <p>ペーストされたテキストに<strong id="paste-line-count">0</strong>行が含まれています。1行ずつ個別のTodoとして追加しますか？</p>
+        <div id="paste-preview" class="paste-confirm__preview" data-testid="paste-preview"></div>
+      </div>
+      <div class="modal__footer">
+        <button type="button" id="paste-as-single" class="modal__btn modal__btn--secondary" data-testid="paste-as-single" tabindex="0">1つのTodoとして追加</button>
+        <button type="button" id="paste-as-multiple" class="modal__btn modal__btn--primary" data-testid="paste-as-multiple" tabindex="0">個別に追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- バッジコレクションモーダル (#406) -->
+  <div id="badge-collection-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="badge-collection-title" hidden data-testid="badge-collection-modal">
+    <div class="modal__backdrop" data-testid="badge-collection-backdrop"></div>
+    <div class="modal__container">
+      <div class="modal__header">
+        <h2 id="badge-collection-title" class="modal__title">バッジコレクション</h2>
+        <button type="button" class="modal__close-btn" aria-label="閉じる" data-testid="badge-collection-close" tabindex="0">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M4 4l10 10M14 4L4 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <div id="badge-collection-grid" class="badge-collection__grid" data-testid="badge-collection-grid">
+          <!-- JS側で動的生成 -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
